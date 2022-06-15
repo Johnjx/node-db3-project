@@ -11,17 +11,42 @@ function find() { // EXERCISE A
       ORDER BY sc.scheme_id ASC;
   */
   return db('schemes as sc')
-  .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
-  .groupBy('sc.scheme_id')
-  .select('sc.scheme_id', 'scheme_name')
-  .count('st.step_id as number_of_steps')
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .groupBy('sc.scheme_id')
+    .select('sc.*')
+    .count('st.step_id as number_of_steps')
 }
 
-function findById(scheme_id) { // EXERCISE B
-  /*
-    1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
+async function findById(scheme_id) { // EXERCISE B
+ const result = await db('schemes as sc')
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .select('sc.scheme_name', 'st.*')
+    .where('sc.scheme_id', scheme_id)
+    .orderBy('st.step_number');
 
-      SELECT
+  if (result[0].scheme_id == null) {
+    const scheme = {
+      scheme_id: scheme_id,
+      scheme_name: result[0].scheme_name,
+      steps: []
+    }
+    return scheme;
+  }
+
+  const scheme = {
+    scheme_id: result[0].scheme_id,
+    scheme_name: result[0].scheme_name,
+    steps: result.map(row => (
+      {
+        step_id: row.step_id,
+        step_number: row.step_number,
+        instructions: row.instructions
+      }
+    ))
+  }
+
+  return scheme;
+   /*    SELECT
           sc.scheme_name,
           st.*
       FROM schemes as sc
@@ -29,59 +54,6 @@ function findById(scheme_id) { // EXERCISE B
           ON sc.scheme_id = st.scheme_id
       WHERE sc.scheme_id = 1
       ORDER BY st.step_number ASC;
-
-    2B- When you have a grasp on the query go ahead and build it in Knex
-    making it parametric: instead of a literal `1` you should use `scheme_id`.
-
-    3B- Test in Postman and see that the resulting data does not look like a scheme,
-    but more like an array of steps each including scheme information:
-
-      [
-        {
-          "scheme_id": 1,
-          "scheme_name": "World Domination",
-          "step_id": 2,
-          "step_number": 1,
-          "instructions": "solve prime number theory"
-        },
-        {
-          "scheme_id": 1,
-          "scheme_name": "World Domination",
-          "step_id": 1,
-          "step_number": 2,
-          "instructions": "crack cyber security"
-        },
-        // etc
-      ]
-
-    4B- Using the array obtained and vanilla JavaScript, create an object with
-    the structure below, for the case _when steps exist_ for a given `scheme_id`:
-
-      {
-        "scheme_id": 1,
-        "scheme_name": "World Domination",
-        "steps": [
-          {
-            "step_id": 2,
-            "step_number": 1,
-            "instructions": "solve prime number theory"
-          },
-          {
-            "step_id": 1,
-            "step_number": 2,
-            "instructions": "crack cyber security"
-          },
-          // etc
-        ]
-      }
-
-    5B- This is what the result should look like _if there are no steps_ for a `scheme_id`:
-
-      {
-        "scheme_id": 7,
-        "scheme_name": "Have Fun!",
-        "steps": []
-      }
   */
 }
 

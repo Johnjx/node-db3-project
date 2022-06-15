@@ -1,3 +1,5 @@
+const db = require('../../data/db-config')
+
 /*
   If `scheme_id` does not exist in the database:
 
@@ -7,7 +9,7 @@
   }
 */
 const checkSchemeId = (req, res, next) => {
-
+  next();
 }
 
 /*
