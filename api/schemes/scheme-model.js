@@ -58,6 +58,7 @@ async function findById(scheme_id) { // EXERCISE B
 }
 
 function findSteps(scheme_id) { // EXERCISE C
+  
   /*
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
