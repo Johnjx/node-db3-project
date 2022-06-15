@@ -8,8 +8,18 @@ const db = require('../../data/db-config')
     "message": "scheme with scheme_id <actual id> not found"
   }
 */
-const checkSchemeId = (req, res, next) => {
-  next();
+const checkSchemeId = async (req, res, next) => {
+  const { scheme_id } = req.params;
+  const result = await db('schemes')
+  .where({ scheme_id })
+  if (!result.length) {
+    next({
+      status: 404,
+      message: `scheme with scheme_id ${scheme_id} not found`
+    })
+    return;
+  }
+  next()
 }
 
 /*
